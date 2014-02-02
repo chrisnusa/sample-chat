@@ -1,12 +1,21 @@
 package com.quickblox.sample.chat.ui.fragments;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -24,11 +33,6 @@ import com.quickblox.sample.chat.core.SingleChat;
 import com.quickblox.sample.chat.ui.activities.ChatActivity;
 import com.quickblox.sample.chat.ui.activities.MainActivity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class UsersFragment extends Fragment implements QBCallback {
 
     private static final String KEY_USER_LOGIN = "userLogin";
@@ -37,6 +41,7 @@ public class UsersFragment extends Fragment implements QBCallback {
     private QBUser companionUser;
     private int listViewIndex;
     private int listViewTop;
+    //private Button scanButton1;
 
     public static UsersFragment getInstance() {
         return new UsersFragment();
@@ -67,6 +72,17 @@ public class UsersFragment extends Fragment implements QBCallback {
                 }
             }
         });
+		/*scanButton1 = (Button) v.findViewById(R.id.scanButton);
+		scanButton1.setOnClickListener(new OnClickListener() {
+			public void onClick(View arg0){
+				Intent intent = new Intent("com.google.zxing.client.android.SCAN");
+				   	  intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); 
+				   	  //startActivity(intent);
+				    	   startActivityForResult(intent, 999);
+			       //IntentIntegrator scanIntegrator = new IntentIntegrator(MainActivity.this);
+					//		scanIntegrator.initiateScan();
+			}
+			});*/
         usersList.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener<ListView>() {
             @Override
             public void onRefresh(PullToRefreshBase<ListView> refreshView) {
@@ -77,6 +93,7 @@ public class UsersFragment extends Fragment implements QBCallback {
                 listViewTop = (v == null) ? 0 : v.getTop();
             }
         });
+
         loadNextPage();
         return v;
     }
@@ -110,8 +127,7 @@ public class UsersFragment extends Fragment implements QBCallback {
             usersList.getRefreshableView().setSelectionFromTop(listViewIndex, listViewTop);
         } else {
             AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-            dialog.setMessage("Error(s) occurred. Look into DDMS log for details, " +
-                    "please. Errors: " + result.getErrors()).create().show();
+            dialog.setMessage("Error(s) occurred: " + result.getErrors()).create().show();
         }
     }
 
@@ -132,4 +148,5 @@ public class UsersFragment extends Fragment implements QBCallback {
         QBUsers.getUsers(getQBPagedRequestBuilder(currentPage), UsersFragment.this);
         ((App)getActivity().getApplication()).setCurrentPage(currentPage + 1);
     }
+
 }

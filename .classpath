@@ -6,5 +6,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="/Users/chrisnusa/Desktop/quickblox-android-sdk-master/jar/quickblox-android-1.1.0.jar"/>
+	<classpathentry kind="lib" path="/ChrisQR/core-2.2-273310c63505538297d65f1a011adb40 4.02.31 PM.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

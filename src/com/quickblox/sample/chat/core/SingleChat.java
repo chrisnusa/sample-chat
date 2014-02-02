@@ -1,15 +1,16 @@
 package com.quickblox.sample.chat.core;
 
+import java.util.Calendar;
+
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.DefaultPacketExtension;
+import org.jivesoftware.smack.packet.Message;
+
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.ChatMessageListener;
 import com.quickblox.module.chat.xmpp.QBPrivateChat;
 import com.quickblox.sample.chat.model.ChatMessage;
 import com.quickblox.sample.chat.ui.activities.ChatActivity;
-
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.Message;
-
-import java.util.Calendar;
 
 public class SingleChat implements Chat, ChatMessageListener {
 
@@ -27,7 +28,7 @@ public class SingleChat implements Chat, ChatMessageListener {
 
     @Override
     public void sendMessage(String message) throws XMPPException {
-        chat.sendMessage(companionId, message);
+    	chat.sendMessage(companionId, message);
     }
 
     @Override

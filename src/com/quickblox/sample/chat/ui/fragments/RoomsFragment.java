@@ -1,10 +1,15 @@
 package com.quickblox.sample.chat.ui.fragments;
 
-import android.app.AlertDialog;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,10 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.quickblox.module.chat.QBChatRoom;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.RoomReceivingListener;
@@ -24,18 +30,13 @@ import com.quickblox.sample.chat.R;
 import com.quickblox.sample.chat.core.RoomChat;
 import com.quickblox.sample.chat.ui.activities.ChatActivity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class RoomsFragment extends Fragment implements RoomReceivingListener {
 
     private static final String KEY_ROOM_NAME = "roomName";
     private ListView roomsList;
     private List<QBChatRoom> rooms;
     private ProgressDialog progressDialog;
-
+    //private Context chatRoom;
     public static RoomsFragment getInstance() {
         return new RoomsFragment();
     }
@@ -50,6 +51,7 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_rooms, container, false);
         roomsList = (ListView) v.findViewById(R.id.roomsList);
+    
         return v;
     }
 
@@ -64,7 +66,9 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
    //     if (id == R.id.action_bar) {
 
        if (id == R.id.action_add) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+    	   Intent intent = new Intent("com.google.zxing.client.android.SCAN"); intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); startActivityForResult(intent, 0);
+       }
+         /*   AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Title");
             final EditText input = new EditText(getActivity());
             builder.setView(input);
@@ -85,22 +89,42 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
             builder.show();
 
             return true;
-        }
+        }*/
         return super.onOptionsItemSelected(item);
     }
 
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		 IntentResult scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		 
+	 
+	        if(scanResult != null) {
+	            String scanContent = " ";
+	 
+	            scanContent += scanResult.getContents();
+	            Log.d("a", scanContent);
+
+	         //   textContent.setText(scanContent);
+	       //     Intent i = new Intent(QRScanner.this, ChooseChat.class);
+		//		  startActivity(i); // brings up the second activity
+
+	}
+	}
+	
+   
     @Override
     public void onReceiveRooms(List<QBChatRoom> list) {
         if (progressDialog != null) {
             progressDialog.dismiss();
         }
-
+        
         rooms = list;
 
         // Prepare rooms list for simple adapter.
         final List<Map<String, String>> roomsListForAdapter = new ArrayList<Map<String, String>>();
         for (QBChatRoom room : rooms) {
-            Map<String, String> roomMap = new HashMap<String, String>();
+       //     QBChatService.getInstance().destroyRoom(room);
+        	Log.d("RoomsFragment:destroying","name room:"+room);
+           Map<String, String> roomMap = new HashMap<String, String>();
             roomMap.put(KEY_ROOM_NAME, room.getName());
             roomsListForAdapter.add(roomMap);
         }
@@ -123,7 +147,9 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
         roomsList.setAdapter(roomsAdapter);
     }
 
-    public void loadRooms() {
+
+
+	public void loadRooms() {
         if (getActivity() != null) {
             progressDialog = ProgressDialog.show(getActivity(), null, "Loading rooms list");
         }

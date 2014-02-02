@@ -35,6 +35,7 @@ public class RoomChat implements Chat, RoomListener, ChatMessageListener {
 
         switch (action) {
         //// where i should replace it with scan
+        //where i can add the parameter
             case CREATE:
           //      Toast.makeText(chatActivity, "Join unsuccessful, try again", Toast.LENGTH_LONG).show();
 
@@ -116,6 +117,6 @@ public class RoomChat implements Chat, RoomListener, ChatMessageListener {
     public void join(QBChatRoom room) {
         QBChatService.getInstance().joinRoom(room, this);
     }
-
+    
     public static enum RoomAction {CREATE, JOIN}
 }
