@@ -68,7 +68,9 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
    //     if (id == R.id.action_bar) {
 
        if (id == R.id.action_add) {
-    	   Intent intent = new Intent("com.google.zxing.client.android.SCAN"); intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); startActivityForResult(intent, 0);
+    	   Intent intent = new Intent("com.google.zxing.client.android.SCAN"); 
+    	   intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); 
+    	   startActivityForResult(intent, 0);
        }
          /*   AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle("Title");
