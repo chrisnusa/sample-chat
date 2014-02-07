@@ -1,6 +1,7 @@
 package com.quickblox.sample.chat.ui.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.quickblox.module.chat.QBChatService;
 import com.quickblox.sample.chat.App;
 import com.quickblox.sample.chat.R;
 import com.quickblox.sample.chat.core.Chat;
@@ -68,7 +70,7 @@ public class ChatActivity extends Activity {
         TextView meLabel = (TextView) findViewById(R.id.meLabel);
         TextView companionLabel = (TextView) findViewById(R.id.companionLabel);
         RelativeLayout container = (RelativeLayout) findViewById(R.id.container);
-
+        
         adapter = new ChatAdapter(this, new ArrayList<ChatMessage>());
         messagesContainer.setAdapter(adapter);
 
@@ -86,8 +88,11 @@ public class ChatActivity extends Activity {
                 companionLabel.setText("user(id" + userId + ")");
                 restoreMessagesFromHistory(userId);
                 break;
+            case test:
+            	onBackPressed();
+            	break;
         }
-
+        
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -140,5 +145,5 @@ public class ChatActivity extends Activity {
         messagesContainer.setSelection(messagesContainer.getCount() - 1);
     }
 
-    public static enum Mode {SINGLE, GROUP}
+    public static enum Mode {SINGLE, GROUP,test}
 }

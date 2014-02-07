@@ -19,12 +19,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.quickblox.module.chat.QBChatRoom;
 import com.quickblox.module.chat.QBChatService;
 import com.quickblox.module.chat.listeners.RoomReceivingListener;
+import com.quickblox.module.users.model.QBUser;
 import com.quickblox.sample.chat.App;
 import com.quickblox.sample.chat.R;
 import com.quickblox.sample.chat.core.RoomChat;
@@ -122,8 +124,6 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
         // Prepare rooms list for simple adapter.
         final List<Map<String, String>> roomsListForAdapter = new ArrayList<Map<String, String>>();
         for (QBChatRoom room : rooms) {
-       //     QBChatService.getInstance().destroyRoom(room);
-        	Log.d("RoomsFragment:destroying","name room:"+room);
            Map<String, String> roomMap = new HashMap<String, String>();
             roomMap.put(KEY_ROOM_NAME, room.getName());
             roomsListForAdapter.add(roomMap);
@@ -138,9 +138,15 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
         roomsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            	
+
                 Bundle bundle = createChatBundle(rooms.get(position).getName(), false);
                 ((App)getActivity().getApplication()).setCurrentRoom(rooms.get(position));
                 ChatActivity.start(getActivity(), bundle);
+             
+              
+                
+                  
             }
         });
 
@@ -158,13 +164,17 @@ public class RoomsFragment extends Fragment implements RoomReceivingListener {
 
     private Bundle createChatBundle(String roomName, boolean createChat) {
         Bundle bundle = new Bundle();
+       
         bundle.putSerializable(ChatActivity.EXTRA_MODE, ChatActivity.Mode.GROUP);
         bundle.putString(RoomChat.EXTRA_ROOM_NAME, roomName);
-        if (createChat) {
-            bundle.putSerializable(RoomChat.EXTRA_ROOM_ACTION, RoomChat.RoomAction.CREATE);
-        } else {
+   //     if (createChat) {
+       //     bundle.putSerializable(RoomChat.EXTRA_ROOM_ACTION, RoomChat.RoomAction.CREATE);
+       // } else  
+       // if(qbUser.getTags().get(0).equals(room.getName())){ 
             bundle.putSerializable(RoomChat.EXTRA_ROOM_ACTION, RoomChat.RoomAction.JOIN);
-        }
+     //   } else
+  //          bundle.putSerializable(RoomChat.EXTRA_ROOM_ACTION, RoomChat.RoomAction.DONTJOIN);
+
         return bundle;
     }
 }

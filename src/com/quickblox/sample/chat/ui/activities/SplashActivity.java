@@ -30,6 +30,7 @@ public class SplashActivity extends Activity implements QBCallback {
 
         QBSettings.getInstance().fastConfigInit(APP_ID, AUTH_KEY, AUTH_SECRET);
         QBAuth.createSession(this);
+        
     }
 
     @Override

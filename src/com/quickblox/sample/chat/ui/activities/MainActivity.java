@@ -119,6 +119,8 @@ if (qbUser !=null){
         } else if (position == POSITION_ROOM) {
             lastAction = Action.ROOM_LIST;
             showAuthenticateDialog();
+           // viewPager.setCurrentItem(position);
+
         }
     }
 
@@ -154,8 +156,12 @@ if (qbUser !=null){
             @Override
             public void onComplete(Result result) {
                 if (result.isSuccess()) {
-                    Toast.makeText(MainActivity.this, "Check In was successful!",
-                            Toast.LENGTH_LONG).show();
+               //     Toast.makeText(MainActivity.this, "Check In was successful!",
+                          //  Toast.LENGTH_LONG).show();
+               
+
+                	Toast.makeText(MainActivity.this, "Check In was successful! " ,
+                              Toast.LENGTH_LONG).show();
                 } else {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                     dialog.setMessage("Error(s) occurred. " +
