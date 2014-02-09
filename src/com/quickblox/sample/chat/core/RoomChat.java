@@ -35,10 +35,7 @@ public class RoomChat implements Chat, RoomListener, ChatMessageListener {
              
         String chatRoomName = chatActivity.getIntent().getStringExtra(EXTRA_ROOM_NAME);
         RoomAction action = (RoomAction) chatActivity.getIntent().getSerializableExtra(EXTRA_ROOM_ACTION);
- if(action==RoomAction.DONTJOIN)
-     Log.d("dontjoin","dontjoin");
-
-
+ 
         QBUser qbUser = ((App) (chatActivity.getApplication())).getQbUser();
        QBChatRoom room=  ((App) chatActivity.getApplication()).getCurrentRoom();
         if(action==RoomAction.JOIN){
@@ -54,7 +51,7 @@ public class RoomChat implements Chat, RoomListener, ChatMessageListener {
         
             else    {
                 Toast.makeText(chatActivity, "can't join this group chat", Toast.LENGTH_LONG).show();
-                Toast.makeText(chatActivity, "" + qbUser.getTags(), Toast.LENGTH_LONG).show();
+                Toast.makeText(chatActivity, "" + qbUser.getTags().get(0), Toast.LENGTH_LONG).show();
             Log.d("important info about room2",""+room.getName());
             Log.d("important info about room3",""+qbUser.getTags().get(0));
 //send intent to chat activity

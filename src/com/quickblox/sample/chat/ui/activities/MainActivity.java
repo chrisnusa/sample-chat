@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -23,9 +26,6 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.quickblox.core.QBCallbackImpl;
 import com.quickblox.core.result.Result;
-import com.quickblox.module.chat.QBChatRoom;
-import com.quickblox.module.chat.QBChatService;
-import com.quickblox.module.chat.listeners.RoomListener;
 import com.quickblox.module.locations.QBLocations;
 import com.quickblox.module.locations.model.QBLocation;
 import com.quickblox.module.users.model.QBUser;
@@ -42,42 +42,26 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     private SectionsPagerAdapter sectionsPagerAdapter;
     private ViewPager viewPager;
     private Action lastAction;
-
+	final Context context = this;
+	private String locationInfo="Please scan your location first";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         List<Fragment> tabs = new ArrayList<Fragment>();
         tabs.add(UsersFragment.getInstance());
         tabs.add(RoomsFragment.getInstance());
-        
+       
+        	
+
+
         sectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), tabs);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.setAdapter(sectionsPagerAdapter);
-
-		/*scanButton.setOnClickListener(new OnClickListener() {
-		public void onClick(View arg0){
-		/*	Intent intent = new Intent(MainActivity.this,
-					CaptureActivity.class);
-			intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-			startActivityForResult(intent, 0);*/
-	    	 
-	//		Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-	   /* 	  intent.putExtra("com.google.zxing.client.android.SCAN.SCAN_MODE", "QR_CODE_MODE"); 
-	    	   startActivityForResult(intent, 0);
-       //IntentIntegrator scanIntegrator = new IntentIntegrator(MainActivity.this);
-		//		scanIntegrator.initiateScan();
-				/*
-			
-		}
-	});*/
-        
-  
         viewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
@@ -93,7 +77,54 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
 
     }
-    
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.rooms, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        QBUser qbUser = ((App) getApplication()).getQbUser();
+        
+       if (id == R.id.action_profile&&qbUser!=null) {
+    	   AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+    	     
+			// set title
+			alertDialogBuilder.setTitle("Account Information");
+
+			// set dialog messageif (qbUser !=null){
+//	    	setLastAction(Action.TEST);
+			alertDialogBuilder
+			
+				.setMessage("My Login: "+qbUser.getLogin()+"\nMy id: "+qbUser.getId()+"\nMy Group: "+qbUser.getTags().get(0)+"\nMy Email: "+qbUser.getEmail()+"\nMy Name: "+qbUser.getFullName()+
+						"\nMy Location: "+locationInfo)
+
+				.setCancelable(false)
+	    	 
+			.setNegativeButton("Okay",new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					// if this button is clicked, just close
+					// the dialog box and do nothing
+					dialog.cancel();
+				}
+			});
+
+				// create alert dialog
+				AlertDialog alertDialog = alertDialogBuilder.create();
+
+				// show it
+				alertDialog.show();
+				}
+       else{
+       	setLastAction(Action.TEST);
+
+           Toast.makeText(MainActivity.this, "Please login first.", Toast.LENGTH_LONG).show();
+	    	 showAuthenticateDialog();
+
+       }
+        return super.onOptionsItemSelected(item);
+    }
     public void scanNow(View view) {
         QBUser qbUser = ((App) getApplication()).getQbUser();
 if (qbUser !=null){
@@ -102,9 +133,10 @@ if (qbUser !=null){
      
     } else{
     	setLastAction(Action.TEST);
+        Toast.makeText(MainActivity.this, "Please login first.", Toast.LENGTH_LONG).show();
+
     	 showAuthenticateDialog();
     	 Log.d("test", "show authenti!");
-         Toast.makeText(MainActivity.this, "Please login first.", Toast.LENGTH_LONG).show();
   
 
     }
@@ -137,20 +169,13 @@ if (qbUser !=null){
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent Intent) {
+
     	IntentResult scan=IntentIntegrator.parseActivityResult(requestCode,
                 resultCode,
                 Intent);
     	if(scan!=null){
     	Log.d("ccc","result from scan: "+scan.getContents());
-  //      QBUser qbUser = ((App) getApplication()).getQbUser();
-    //    StringifyArrayList<String> tags = new StringifyArrayList<String>();
-/*
-        tags.add(""+scan.getContents());
-        tags.add("test tags");
-        qbUser.setTags(tags);
-      
-      	Log.d("axx", ""+qbUser.getTags());
-*/
+    	locationInfo=""+scan.getContents();
       	QBLocation location = new QBLocation(22.2783,114.1589, ""+scan.getContents());
       	QBLocations.createLocation(location, new QBCallbackImpl() {
             @Override
@@ -191,11 +216,24 @@ if (qbUser !=null){
     
 }
     
+
+	public void onActivityResult1(int requestCode, int resultCode, Intent intent) {
+		
+	}   
     private void showUsersFragment() {
         getSupportActionBar().selectTab(getSupportActionBar().getTabAt(POSITION_USER));
         viewPager.setCurrentItem(POSITION_USER);
     }
 
+   /*public void showRoomsFragment() {
+
+        getSupportActionBar().selectTab(getSupportActionBar().getTabAt(POSITION_ROOM));
+        viewPager.setCurrentItem(POSITION_ROOM);
+        ((RoomsFragment) sectionsPagerAdapter.getItem(POSITION_ROOM)).loadRooms();
+
+
+    }*/
+    
     public void setLastAction(Action lastAction) {
         this.lastAction = lastAction;
     }
