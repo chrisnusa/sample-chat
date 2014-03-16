@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="/Users/chrisnusa/Desktop/quickblox-android-sdk-master/jar/quickblox-android-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/ChrisQR/core-2.2-273310c63505538297d65f1a011adb40 4.02.31 PM.jar"/>
+	<classpathentry exported="true" kind="lib" path="/ChrisQR/core-2.2-273310c63505538297d65f1a011adb40 4.02.31 PM.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/chrisnusa/Desktop/Android/google-play-services_lib/libs/google-play-services.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

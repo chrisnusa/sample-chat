@@ -15,9 +15,12 @@ import com.quickblox.sample.chat.R;
 
 public class SplashActivity extends Activity implements QBCallback {
 
-    private static final String APP_ID = "6527";
-    private static final String AUTH_KEY = "kXT9UMyrTy3qFAL";
-    private static final String AUTH_SECRET = "M2bFP7WGgHJHzVM";
+  /*  private static final String APP_ID = "7059";
+    private static final String AUTH_KEY = "E--FMdY8sOcDb6U";
+    private static final String AUTH_SECRET = "w4hAxxpgrpmDrkv";*/
+    private static final String APP_ID = "8243";
+    private static final String AUTH_KEY = "hTzrPmFxUZOUdGn";
+    private static final String AUTH_SECRET = "26qaJOGJbbvWBVM";
 
     private ProgressBar progressBar;
 

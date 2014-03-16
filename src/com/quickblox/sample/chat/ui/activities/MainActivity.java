@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -24,17 +25,21 @@ import android.widget.Toast;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.quickblox.core.QBCallback;
 import com.quickblox.core.QBCallbackImpl;
 import com.quickblox.core.result.Result;
+import com.quickblox.internal.core.exception.BaseServiceException;
+import com.quickblox.module.auth.QBAuth;
 import com.quickblox.module.locations.QBLocations;
 import com.quickblox.module.locations.model.QBLocation;
+import com.quickblox.module.users.QBUsers;
 import com.quickblox.module.users.model.QBUser;
 import com.quickblox.sample.chat.App;
 import com.quickblox.sample.chat.R;
 import com.quickblox.sample.chat.ui.fragments.RoomsFragment;
 import com.quickblox.sample.chat.ui.fragments.UsersFragment;
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, QBCallback {
 
     private static final int AUTHENTICATION_REQUEST = 1;
     private static final int POSITION_USER = 0;
@@ -44,10 +49,14 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     private Action lastAction;
 	final Context context = this;
 	private String locationInfo="Please scan your location first";
+    private QBUser user;
+    private static final String TOKEN = "TOKEN";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+      
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -75,10 +84,73 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
                     .setTabListener(this));
         }
 
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+      super.onSaveInstanceState(savedInstanceState);
+	  Log.d("state state", "state1");
+		 
+		try {
+			double	TOKEnTime = QBAuth.getBaseService().getTokenExpirationDate().getTime();
+	        Log.d("TOKENTIME",""+TOKEnTime);
+	        savedInstanceState.putDouble(TOKEN, TOKEnTime);
+		} catch (BaseServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+      QBUser qbUser = ((App) getApplication()).getQbUser();
+      if(qbUser!=null){
+      savedInstanceState.putString("USER_ID", qbUser.getId().toString());
+      savedInstanceState.putString("PASSWORD", qbUser.getPassword().toString());
+	  Log.d("state state", "state2");
+	  
+    }
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+      super.onRestoreInstanceState(savedInstanceState);
+      // Restore UI state from the savedInstanceState.
+      // This bundle has also been passed to onCreate. 
+//      if (savedInstanceState != null) {
+	  Log.d("state state", "state3");
 
+	  if(user==null &&savedInstanceState != null){
+		  
+          //  mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        	  String idSIS = savedInstanceState.getString("USER_ID");
+        	  String passSIS = savedInstanceState.getString("PASSWORD");
+        	  Log.d("state state", idSIS);
+
+             //user = new QBUser(idSIS, passSIS);
+      //       QBUsers.signIn(user, this);
+
+          //   ((App)getApplication()).setQbUser(user);
+        	  //trying to sign in when the token has expired
+              //
+              // Create session with additional parameters
+              try {
+          		double TOKEnTime2=   QBAuth.getBaseService().getTokenExpirationDate().getTime();
+                  Log.d("TOKENTIME",""+TOKEnTime2);
+                  double token1= savedInstanceState.getDouble(TOKEN);
+                  if(TOKEnTime2-token1>300000){//token expires in 2 hours, if the difference in token time is more than 5 minutes, log in again
+            	  QBUser qbUser = new QBUser();
+                  qbUser.setLogin(idSIS);
+                  qbUser.setPassword(passSIS);
+                  QBAuth.createSession(qbUser, this);
+                  Log.d("TOKEN WORKS","TOKEN WORKS");
+                  }
+          	} catch (BaseServiceException e) {
+          		// TODO Auto-generated catch block
+          		e.printStackTrace();
+          	}
+
+
+	  }
+     //   }
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.map, menu);  
         getMenuInflater().inflate(R.menu.rooms, menu);
         return true;
     }
@@ -86,7 +158,6 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         QBUser qbUser = ((App) getApplication()).getQbUser();
-        
        if (id == R.id.action_profile&&qbUser!=null) {
     	   AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
     	     
@@ -116,12 +187,15 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 				// show it
 				alertDialog.show();
 				}
-       else{
-       	setLastAction(Action.TEST);
+       else if (id == R.id.action_map&&qbUser!=null) {
 
-           Toast.makeText(MainActivity.this, "Please login first.", Toast.LENGTH_LONG).show();
+         
+	    	 Intent intent = new Intent(this, MapActivity.class);
+	            startActivity(intent);
+       } else {
+    	   Toast.makeText(MainActivity.this, "Please login first. ", Toast.LENGTH_LONG).show();
 	    	 showAuthenticateDialog();
-
+          	setLastAction(Action.TEST);
        }
         return super.onOptionsItemSelected(item);
     }
@@ -157,17 +231,6 @@ if (qbUser !=null){
     }
 
     @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-    }
-   
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent Intent) {
 
     	IntentResult scan=IntentIntegrator.parseActivityResult(requestCode,
@@ -176,7 +239,12 @@ if (qbUser !=null){
     	if(scan!=null){
     	Log.d("ccc","result from scan: "+scan.getContents());
     	locationInfo=""+scan.getContents();
-      	QBLocation location = new QBLocation(22.2783,114.1589, ""+scan.getContents());
+    	
+    	String[] splitStrings = scan.getContents().split(",");
+    	double x = Double.parseDouble(scan.getContents().split(",")[1]);
+    	double y = Double.parseDouble(scan.getContents().split(",")[2]);
+
+      	QBLocation location = new QBLocation(x,y, ""+splitStrings[0]);
       	QBLocations.createLocation(location, new QBCallbackImpl() {
             @Override
             public void onComplete(Result result) {
@@ -217,9 +285,6 @@ if (qbUser !=null){
 }
     
 
-	public void onActivityResult1(int requestCode, int resultCode, Intent intent) {
-		
-	}   
     private void showUsersFragment() {
         getSupportActionBar().selectTab(getSupportActionBar().getTabAt(POSITION_USER));
         viewPager.setCurrentItem(POSITION_USER);
@@ -285,6 +350,7 @@ if (qbUser !=null){
         public int getCount() {
             return fragments.size();
         }
+        
 
         @Override
         public CharSequence getPageTitle(int position) {
@@ -297,4 +363,25 @@ if (qbUser !=null){
             return null;
         }
     }
+
+	@Override
+	public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onComplete(Result arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onComplete(Result arg0, Object arg1) {
+		// TODO Auto-generated method stub
+		
+	}
 }
